@@ -252,6 +252,30 @@ module.exports = (() => {
 				}]);
 			};
 
+			function CreateThreadChannelContextMenuChildren(instance, props)
+			{
+				return ContextMenu.buildMenuChildren([{
+					type: "group",
+					items: [
+						{
+							type: "submenu",
+							label: "ChannelTabs",
+							items: instance.mergeItems([
+								{
+									label: "Open in new tab",
+									action: ()=>TopBarRef.current && TopBarRef.current.saveChannel(props.channel.guild_id, props.channel.id, "#" + props.channel.name, getCurrentIconUrl(`/channels/${props.channel.guild_id}/${props.channel.parent_id}`) || "")
+								}],
+								[{
+									label: "Save channel as bookmark",
+									action: ()=>TopBarRef.current && TopBarRef.current.addToFavs("#" + props.channel.name, getCurrentIconUrl(`/channels/${props.channel.guild_id}/${props.channel.parent_id}`) || "", `/channels/${props.channel.guild_id}/${props.channel.id}`, props.channel.id)
+								}]
+							)
+						}
+					]
+				}]);
+			};
+
+
 			function CreateDMContextMenuChildren(instance, props)
 			{
 				return ContextMenu.buildMenuChildren([{
@@ -3380,6 +3404,11 @@ module.exports = (() => {
 						ContextMenu.patch("channel-context", (returnValue, props) => {
 							if(!this.settings.showTabBar && !this.settings.showFavBar) return;
 							returnValue.props.children.push(CreateTextChannelContextMenuChildren(this, props));
+						}),
+
+						ContextMenu.patch("thread-context", (returnValue, props) => {
+							if(!this.settings.showTabBar && !this.settings.showFavBar) return;
+							returnValue.props.children.push(CreateThreadChannelContextMenuChildren(this, props));
 						}),
 
 						ContextMenu.patch("user-context", (returnValue, props) => {
